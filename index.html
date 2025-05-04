@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>秦一骅</title>
+  <!-- ✅ 直接引入 vue.global.js（从 CDN 上加载 Vue） -->
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+</head>
+<body>
+  <div id="app">
+    <button @click="count++">{{ count }}</button>
+  </div>
+  
+  <script>
+  const { createApp, ref } = Vue;
+  
+  const app = createApp({
+    setup() {
+      const count = ref(0);
+      function increment() {
+        count.value++;
+      };
+      return { count, increment };
+    }
+  });
+  
+  app.mount('#app')
+  </script>
+</body>
+</html>
