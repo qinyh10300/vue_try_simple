@@ -1,30 +1,70 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>秦一骅</title>
-  <!-- ✅ 直接引入 vue.global.js（从 CDN 上加载 Vue） -->
+  <meta charset="UTF-8" />
+  <title>海龟汤 AI 小游戏</title>
   <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
 </head>
 <body>
   <div id="app">
-    <button @click="count++">{{ count }}</button>
+    <h1>🐢 海龟汤小游戏</h1>
+
+    <p><strong>汤面：</strong>{{ puzzle }}</p>
+
+    <input v-model="question" placeholder="请输入你的问题..." @keyup.enter="ask">
+    <button @click="ask">提问</button>
+    <button @click="restart">重开</button>
+
+    <p v-if="answer"><strong>AI 回答：</strong>{{ answer }}</p>
   </div>
-  
+
   <script>
-  const { createApp, ref } = Vue;
-  
-  const app = createApp({
-    setup() {
-      const count = ref(0);
-      function increment() {
-        count.value++;
-      };
-      return { count, increment };
-    }
-  });
-  
-  app.mount('#app')
+    const app = Vue.createApp({
+      data() {
+        return {
+          puzzle: '',
+          question: '',
+          answer: ''
+        }
+      },
+      methods: {
+        loadPuzzle() {
+          fetch('/api/puzzle')
+            .then(res => res.json())
+            .then(data => {
+              this.puzzle = data.prompt;
+              this.answer = '';
+              this.question = '';
+            });
+        },
+        ask() {
+          if (!this.question.trim()) return;
+          fetch('/api/ask', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ question: this.question })
+          })
+          .then(res => res.text())
+          .then(data => {
+            this.answer = data;
+          });
+        },
+        restart() {
+          fetch('/api/restart', { method: 'POST' })
+            .then(res => res.json())
+            .then(data => {
+              this.puzzle = data.prompt;
+              this.answer = '';
+              this.question = '';
+            });
+        }
+      },
+      mounted() {
+        this.loadPuzzle();
+      }
+    });
+
+    app.mount('#app');
   </script>
 </body>
 </html>
