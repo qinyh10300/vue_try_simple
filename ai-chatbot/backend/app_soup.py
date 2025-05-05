@@ -3,7 +3,8 @@ from flask_cors import CORS
 from SiliconFlow import SiliconFlow
 
 app = Flask(__name__)
-CORS(app)  # Enable CORS for frontend
+# CORS(app)  # Enable CORS for frontend
+CORS(app, resources={r"/api/*": {"origins": "http://localhost:8080"}})  # Enable CORS for frontend
 llm = SiliconFlow()
 
 soup_q = '''
@@ -40,7 +41,7 @@ def get_soup():
 @app.route('/api/ask', methods=['POST'])
 def ask():
     data = request.get_json()
-    question = data.get('question', '')
+    question = data.get('question', '')   # 如果key不存在，返回默认值''
     # print(question)
     if not question:
         return jsonify({'error': 'Question is required'}), 400
